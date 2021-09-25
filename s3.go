@@ -41,10 +41,6 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 			continue
 		}
 
-		if value == "" {
-			value = os.Getenv("S3_" + strings.ToUpper(key))
-		}
-
 		switch key {
 		case "host":
 			s3.Host = value
@@ -64,6 +60,27 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 
 func (s3 *S3) Provision(ctx caddy.Context) error {
 	s3.logger = ctx.Logger(s3)
+
+	// Load Environment
+	if s3.Host == "" {
+		s3.Host = os.Getenv("S3_HOST")
+	}
+
+	if s3.Bucket == "" {
+		s3.Bucket = os.Getenv("S3_BUCKET")
+	}
+
+	if s3.AccessID == "" {
+		s3.AccessID = os.Getenv("S3_ACCESS_ID")
+	}
+
+	if s3.SecretKey == "" {
+		s3.SecretKey = os.Getenv("S3_SECRET_KEY")
+	}
+
+	if s3.Prefix == "" {
+		s3.Prefix = os.Getenv("S3_PREFIX")
+	}
 
 	// S3 Client
 	client, err := minio.New(s3.Host, &minio.Options{
