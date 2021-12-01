@@ -4,15 +4,17 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/certmagic"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"go.uber.org/zap"
-	"io/ioutil"
-	"os"
-	"strings"
 )
 
 type S3 struct {
@@ -25,6 +27,7 @@ type S3 struct {
 	AccessID  string `json:"access_id"`
 	SecretKey string `json:"secret_key"`
 	Prefix    string `json:"prefix"`
+	Insecure  bool   `json:"insecure"`
 }
 
 func init() {
@@ -52,6 +55,12 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 			s3.SecretKey = value
 		case "prefix":
 			s3.Prefix = value
+		case "insecure":
+			insecure, err := strconv.ParseBool(value)
+			if err != nil {
+				return d.Err("Invalid usage of insecure in s3-storage config: " + err.Error())
+			}
+			s3.Insecure = insecure
 		}
 	}
 
@@ -82,10 +91,18 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 		s3.Prefix = os.Getenv("S3_PREFIX")
 	}
 
+	if !s3.Insecure {
+		insecure := os.Getenv("S3_INSECURE")
+		if insecure != "" {
+			s3.Insecure, _ = strconv.ParseBool(insecure)
+		}
+	}
+	secure := !s3.Insecure
+
 	// S3 Client
 	client, err := minio.New(s3.Host, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3.AccessID, s3.SecretKey, ""),
-		Secure: true,
+		Secure: secure,
 	})
 
 	if err != nil {
