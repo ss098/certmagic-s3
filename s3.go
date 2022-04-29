@@ -131,11 +131,11 @@ func (s3 S3) Lock(ctx context.Context, key string) error {
 	return nil
 }
 
-func (s3 S3) Unlock(key string) error {
+func (s3 S3) Unlock(ctx context.Context, key string) error {
 	return nil
 }
 
-func (s3 S3) Store(key string, value []byte) error {
+func (s3 S3) Store(ctx context.Context, key string, value []byte) error {
 	key = s3.KeyPrefix(key)
 	length := int64(len(value))
 
@@ -146,7 +146,7 @@ func (s3 S3) Store(key string, value []byte) error {
 	return err
 }
 
-func (s3 S3) Load(key string) ([]byte, error) {
+func (s3 S3) Load(ctx context.Context, key string) ([]byte, error) {
 	key = s3.KeyPrefix(key)
 
 	s3.logger.Debug(fmt.Sprintf("Load key: %s", key))
@@ -160,7 +160,7 @@ func (s3 S3) Load(key string) ([]byte, error) {
 	return ioutil.ReadAll(object)
 }
 
-func (s3 S3) Delete(key string) error {
+func (s3 S3) Delete(ctx context.Context, key string) error {
 	key = s3.KeyPrefix(key)
 
 	s3.logger.Debug(fmt.Sprintf("Delete key: %s", key))
@@ -168,7 +168,7 @@ func (s3 S3) Delete(key string) error {
 	return s3.Client.RemoveObject(context.Background(), s3.Bucket, key, minio.RemoveObjectOptions{})
 }
 
-func (s3 S3) Exists(key string) bool {
+func (s3 S3) Exists(ctx context.Context, key string) bool {
 	key = s3.KeyPrefix(key)
 
 	_, err := s3.Client.StatObject(context.Background(), s3.Bucket, key, minio.StatObjectOptions{})
@@ -180,7 +180,7 @@ func (s3 S3) Exists(key string) bool {
 	return exists
 }
 
-func (s3 S3) List(prefix string, recursive bool) ([]string, error) {
+func (s3 S3) List(ctx context.Context, prefix string, recursive bool) ([]string, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	defer cancel()
@@ -199,7 +199,7 @@ func (s3 S3) List(prefix string, recursive bool) ([]string, error) {
 	return keys, nil
 }
 
-func (s3 S3) Stat(key string) (certmagic.KeyInfo, error) {
+func (s3 S3) Stat(ctx context.Context, key string) (certmagic.KeyInfo, error) {
 	key = s3.KeyPrefix(key)
 
 	object, err := s3.Client.StatObject(context.Background(), s3.Bucket, key, minio.StatObjectOptions{})
