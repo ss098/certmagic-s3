@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -147,6 +148,10 @@ func (s3 S3) Store(ctx context.Context, key string, value []byte) error {
 }
 
 func (s3 S3) Load(ctx context.Context, key string) ([]byte, error) {
+	if !s3.Exists(ctx, key) {
+		return nil, fs.ErrNotExist
+	}
+
 	key = s3.KeyPrefix(key)
 
 	s3.logger.Debug(fmt.Sprintf("Load key: %s", key))
