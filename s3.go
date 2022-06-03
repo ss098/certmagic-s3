@@ -228,3 +228,7 @@ func (s3 S3) Stat(ctx context.Context, key string) (certmagic.KeyInfo, error) {
 func (s3 S3) KeyPrefix(key string) string {
 	return s3.Prefix + "/" + key
 }
+
+func (s3 S3) String() string {
+	return fmt.Sprintf("S3 Storage Host: %s, Bucket: %s, Prefix: %s", s3.Host, s3.Bucket, s3.Prefix)
+}

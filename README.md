@@ -6,7 +6,7 @@ CertMagic S3-compatible driver written in Go.
 
 Build
 
-    go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
+    go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
     xcaddy build --output ./caddy --with github.com/ss098/certmagic-s3
 
