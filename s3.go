@@ -117,11 +117,11 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 
 	var creds *credentials.Credentials
 	if s3.UseIamProvider {
-		s3.logger.Info("use secret_key and access_id for credentials")
-		creds = credentials.NewStaticV4(s3.AccessID, s3.SecretKey, "")
-	} else {
 		s3.logger.Info("use iam aws provider for credentials")
 		creds = credentials.NewIAM("")
+	} else {
+		s3.logger.Info("use secret_key and access_id for credentials")
+		creds = credentials.NewStaticV4(s3.AccessID, s3.SecretKey, "")
 	}
 
 	// S3 Client
