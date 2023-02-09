@@ -22,13 +22,14 @@ type S3 struct {
 	logger *zap.Logger
 
 	// S3
-	Client    *minio.Client
-	Host      string `json:"host"`
-	Bucket    string `json:"bucket"`
-	AccessID  string `json:"access_id"`
-	SecretKey string `json:"secret_key"`
-	Prefix    string `json:"prefix"`
-	Insecure  bool   `json:"insecure"`
+	Client         *minio.Client
+	Host           string `json:"host"`
+	Bucket         string `json:"bucket"`
+	AccessID       string `json:"access_id"`
+	SecretKey      string `json:"secret_key"`
+	Prefix         string `json:"prefix"`
+	Insecure       bool   `json:"insecure"`
+	UseIamProvider bool   `json:"use_iam_provider"`
 }
 
 func init() {
@@ -62,7 +63,14 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 				return d.Err("Invalid usage of insecure in s3-storage config: " + err.Error())
 			}
 			s3.Insecure = insecure
+		case "use_iam_provider":
+			boolValue, err := strconv.ParseBool(value)
+			if err != nil {
+				return d.Err("Invalid usage of use_iam_provider in s3-storage config: " + err.Error())
+			}
+			s3.UseIamProvider = boolValue
 		}
+
 	}
 
 	return nil
@@ -100,9 +108,25 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 	}
 	secure := !s3.Insecure
 
+	if !s3.UseIamProvider {
+		boolVal := os.Getenv("S3_USE_IAM_PROVIDER")
+		if boolVal != "" {
+			s3.UseIamProvider, _ = strconv.ParseBool(boolVal)
+		}
+	}
+
+	var creds *credentials.Credentials
+	if s3.UseIamProvider {
+		s3.logger.Info("use secret_key and access_id for credentials")
+		creds = credentials.NewStaticV4(s3.AccessID, s3.SecretKey, "")
+	} else {
+		s3.logger.Info("use iam aws provider for credentials")
+		creds = credentials.NewIAM("")
+	}
+
 	// S3 Client
 	client, err := minio.New(s3.Host, &minio.Options{
-		Creds:  credentials.NewStaticV4(s3.AccessID, s3.SecretKey, ""),
+		Creds:  creds,
 		Secure: secure,
 	})
 

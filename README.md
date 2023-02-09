@@ -62,3 +62,20 @@ From Environment
     S3_SECRET_KEY
     S3_PREFIX
     S3_INSECURE
+
+
+AWS IAM Provider Example
+
+Caddyfile Example
+
+    # Global Config
+
+    {
+        storage s3 {
+            host "Host"
+            bucket "Bucket"
+            use_iam_provider: true,
+            prefix "ssl"
+            insecure false #disables SSL if true
+        }
+    }
