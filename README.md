@@ -74,7 +74,7 @@ Caddyfile Example
         storage s3 {
             host "Host"
             bucket "Bucket"
-            use_iam_provider: true,
+            use_iam_provider true
             prefix "ssl"
             insecure false #disables SSL if true
         }
