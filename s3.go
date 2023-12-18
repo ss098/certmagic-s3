@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -250,7 +251,7 @@ func (s3 S3) Stat(ctx context.Context, key string) (certmagic.KeyInfo, error) {
 }
 
 func (s3 S3) KeyPrefix(key string) string {
-	return s3.Prefix + "/" + key
+	return path.Join(s3.Prefix, key)
 }
 
 func (s3 S3) String() string {
