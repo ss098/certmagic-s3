@@ -216,14 +216,14 @@ func (s3 S3) List(ctx context.Context, prefix string, recursive bool) ([]string,
 	defer cancel()
 
 	objects := s3.Client.ListObjects(ctx, s3.Bucket, minio.ListObjectsOptions{
-		Prefix:    prefix,
+		Prefix:    s3.KeyPrefix(prefix),
 		Recursive: recursive,
 	})
 
 	keys := make([]string, len(objects))
 
 	for object := range objects {
-		keys = append(keys, object.Key)
+		keys = append(keys, s3.CutKeyPrefix(object.Key))
 	}
 
 	return keys, nil
@@ -252,6 +252,10 @@ func (s3 S3) Stat(ctx context.Context, key string) (certmagic.KeyInfo, error) {
 
 func (s3 S3) KeyPrefix(key string) string {
 	return path.Join(s3.Prefix, key)
+}
+func (s3 S3) CutKeyPrefix(key string) string {
+	cutted, _ := strings.CutPrefix(key, s3.Prefix)
+	return cutted
 }
 
 func (s3 S3) String() string {
