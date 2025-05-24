@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+        - master
+        - main
+  pull_request:
+    branches:
+        - master
+        - main
+
+jobs:
+    build-test:
+      strategy:
+        matrix:
+          GOOS: ['linux']
+          GOARCH: ['amd64', 'arm64']
+      runs-on: ubuntu-latest
+      env:
+        GOOS: ${{ matrix.GOOS }}
+        GOARCH: ${{ matrix.GOARCH }}
+        CGO_ENABLED: "0"
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Install Go
+          uses: actions/setup-go@v5
+          with:
+            go-version: stable
+
+        - name: Install xcaddy
+          run: |
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+
+        - name: xcaddy simple test
+          run: |
+            xcaddy list-modules
+
+
+
+

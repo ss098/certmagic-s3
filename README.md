@@ -1,8 +1,8 @@
-## CertMagic-S3
+# CertMagic-S3
 
 CertMagic S3-compatible driver written in Go.
 
-### Guide
+## Guide
 
 Build
 
@@ -62,7 +62,6 @@ From Environment
     S3_SECRET_KEY
     S3_PREFIX
     S3_INSECURE
-
 
 AWS IAM Provider Example
 
