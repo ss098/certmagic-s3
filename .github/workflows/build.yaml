@@ -42,6 +42,7 @@ jobs:
 
         - name: xcaddy simple test
           run: |
+            PATH="$PATH:$(go env GOPATH)/bin" export PATH
             xcaddy list-modules
 
 
