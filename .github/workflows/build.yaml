@@ -12,8 +12,12 @@ on:
         - master
         - main
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
-    build-test:
+    build:
       strategy:
         matrix:
           GOOS: ['linux']
