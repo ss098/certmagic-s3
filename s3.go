@@ -291,7 +291,7 @@ func (s3 *S3) String() string {
 }
 
 func validateHost(h string) error {
-	u, err := url.ParseRequestURI(h)
+	u, err := url.Parse(h)
 	if err != nil {
 		return fmt.Errorf("invalid host: must be a hostname: %w", err)
 	}
