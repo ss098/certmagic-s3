@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	// implementing these interfaces
 	_ caddy.Module          = (*S3)(nil)
 	_ certmagic.Storage     = (*S3)(nil)
 	_ certmagic.Locker      = (*S3)(nil)
