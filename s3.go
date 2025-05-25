@@ -61,6 +61,10 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 		switch key {
 		case "host":
 			s3.Host = value
+			err := validateHost(s3.Host)
+			if err != nil {
+				return d.Err("Invalid usage of insecure in s3-storage config: " + err.Error())
+			}
 		case "bucket":
 			s3.Bucket = value
 		case "access_id":
