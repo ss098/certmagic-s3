@@ -239,9 +239,6 @@ func (s3 *S3) Exists(ctx context.Context, key string) bool {
 }
 
 func (s3 *S3) List(ctx context.Context, prefix string, recursive bool) ([]string, error) {
-	ctx, cancel := context.WithCancel(ctx)
-
-	defer cancel()
 
 	objects := s3.client.ListObjects(ctx, s3.Bucket, minio.ListObjectsOptions{
 		Prefix:    s3.KeyPrefix(prefix),
