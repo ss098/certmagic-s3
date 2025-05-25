@@ -28,8 +28,8 @@ Caddyfile Example
 
     {
         storage s3 {
-            host "Host"
-            bucket "Bucket"
+            host "s3.example.com"
+            bucket "my-cert-bucket"
             access_id "Access ID"
             secret_key "Secret Key"
             prefix "ssl"
@@ -42,8 +42,8 @@ JSON Config Example
     {
       "storage": {
         "module": "s3",
-        "host": "Host",
-        "bucket": "Bucket",
+        "host": "s3.example.com",
+        "bucket": "my-cert-bucket",
         "access_id": "Access ID",
         "secret_key": "Secret Key",
         "prefix": "ssl",
@@ -71,8 +71,8 @@ Caddyfile Example
 
     {
         storage s3 {
-            host "Host"
-            bucket "Bucket"
+            host "s3.example.com"
+            bucket "my-cert-bucket"
             use_iam_provider true
             prefix "ssl"
             insecure false #disables SSL if true
