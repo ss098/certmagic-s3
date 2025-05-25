@@ -40,7 +40,7 @@ jobs:
           run: |
             PATH="$PATH:$(go env GOPATH)/bin" ; export PATH
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-            xcaddy build --with github.com/jxsl13/certmagic-s3=.
+            xcaddy build --with github.com/ss098/certmagic-s3=.
 
 
 
