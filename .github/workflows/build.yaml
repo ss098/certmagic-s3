@@ -7,10 +7,6 @@ on:
     branches:
         - master
         - main
-  pull_request:
-    branches:
-        - master
-        - main
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,7 +37,4 @@ jobs:
             PATH="$PATH:$(go env GOPATH)/bin" ; export PATH
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
             xcaddy build --with github.com/ss098/certmagic-s3=.
-
-
-
 
