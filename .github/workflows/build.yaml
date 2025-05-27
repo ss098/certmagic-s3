@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+        - master
+        - main
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build:
+      strategy:
+        matrix:
+          GOOS: ['linux']
+          GOARCH: ['amd64']
+      runs-on: ubuntu-latest
+      env:
+        GOOS: ${{ matrix.GOOS }}
+        GOARCH: ${{ matrix.GOARCH }}
+        CGO_ENABLED: "0"
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Install Go
+          uses: actions/setup-go@v5
+          with:
+            go-version: stable
+
+        - name: Install xcaddy & build
+          run: |
+            PATH="$PATH:$(go env GOPATH)/bin" ; export PATH
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+            xcaddy build --with github.com/ss098/certmagic-s3=.
+
