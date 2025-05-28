@@ -105,6 +105,17 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 		return err
 	}
 
+	if !s3.UseIamProvider {
+		boolVal := os.Getenv("S3_USE_IAM_PROVIDER")
+		if boolVal != "" {
+			s3.UseIamProvider, err = strconv.ParseBool(boolVal)
+
+			if err != nil {
+				s3.UseIamProvider = false // default value
+			}
+		}
+	}
+
 	if s3.Bucket == "" {
 		s3.Bucket = os.Getenv("S3_BUCKET")
 		if s3.Bucket == "" {
@@ -114,15 +125,15 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 
 	if s3.AccessID == "" {
 		s3.AccessID = os.Getenv("S3_ACCESS_ID")
-		if s3.AccessID == "" {
-			return errors.New("access_id is empty")
+		if s3.AccessID == "" && !s3.UseIamProvider {
+			return errors.New("access_id is empty and use_iam_provider is false")
 		}
 	}
 
 	if s3.SecretKey == "" {
 		s3.SecretKey = os.Getenv("S3_SECRET_KEY")
-		if s3.SecretKey == "" {
-			return errors.New("secret_key is empty")
+		if s3.SecretKey == "" && !s3.UseIamProvider {
+			return errors.New("secret_key is empty and use_iam_provider is false")
 		}
 	}
 
@@ -134,22 +145,13 @@ func (s3 *S3) Provision(ctx caddy.Context) error {
 		insecure := os.Getenv("S3_INSECURE")
 		if insecure != "" {
 			s3.Insecure, err = strconv.ParseBool(insecure)
+
 			if err != nil {
-				return fmt.Errorf("invalid insecure value, must be either true or false: %w", err)
+				s3.Insecure = false // default value
 			}
 		}
 	}
 	secure := !s3.Insecure
-
-	if !s3.UseIamProvider {
-		boolVal := os.Getenv("S3_USE_IAM_PROVIDER")
-		if boolVal != "" {
-			s3.UseIamProvider, err = strconv.ParseBool(boolVal)
-			if err != nil {
-				return fmt.Errorf("invalid use_iam_provider value: %w", err)
-			}
-		}
-	}
 
 	var creds *credentials.Credentials
 	if s3.UseIamProvider {
