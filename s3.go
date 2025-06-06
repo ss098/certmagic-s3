@@ -222,6 +222,8 @@ func (s3 *S3) Load(ctx context.Context, key string) ([]byte, error) {
 		return nil, err
 	}
 
+	defer object.Close()
+	
 	return io.ReadAll(object)
 }
 
