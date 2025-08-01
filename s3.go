@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net"
 	"net/url"
 	"os"
 	"path"
@@ -297,6 +298,10 @@ func (s3 *S3) String() string {
 }
 
 func validateHost(h string) error {
+	x, _, err := net.SplitHostPort(h)
+	if err == nil && x != "" {
+		h = x
+	}
 	u, err := url.Parse(h)
 	if err != nil {
 		return fmt.Errorf("invalid host: must be a hostname: %w", err)
