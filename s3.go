@@ -94,6 +94,14 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 }
 
 func (s3 *S3) Provision(ctx caddy.Context) error {
+	repl := caddy.NewReplacer()
+
+	s3.Host = repl.ReplaceKnown(s3.Host, "")
+	s3.Bucket = repl.ReplaceKnown(s3.Bucket, "")
+	s3.AccessID = repl.ReplaceKnown(s3.AccessID, "")
+	s3.SecretKey = repl.ReplaceKnown(s3.SecretKey, "")
+	s3.Prefix = repl.ReplaceKnown(s3.Prefix, "")
+
 	s3.logger = ctx.Logger(s3)
 
 	// Load Environment
@@ -224,7 +232,7 @@ func (s3 *S3) Load(ctx context.Context, key string) ([]byte, error) {
 	}
 
 	defer object.Close()
-	
+
 	return io.ReadAll(object)
 }
 
